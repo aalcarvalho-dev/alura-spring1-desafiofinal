@@ -3,9 +3,11 @@ package com.alura.spring_desafiofinal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.alura.spring_desafiofinal.record.Dados;
 import com.alura.spring_desafiofinal.record.DadosMarca;
+import com.alura.spring_desafiofinal.record.DadosModelo;
 import com.alura.spring_desafiofinal.service.ConsumoAPI;
 import com.alura.spring_desafiofinal.service.ConverteDados;
 
@@ -24,6 +26,8 @@ public class Principal {
     ConverteDados conversor = new ConverteDados();
     List<DadosMarca> listaMarcas = new ArrayList<>();
     List<Dados> listaDados = new ArrayList<>();
+    DadosModelo modelos;
+    //Dados dados;
 
     public void inicia(){
         System.out.println("Bem-vindos ao sistema de consulta FIPE");
@@ -99,20 +103,42 @@ public class Principal {
     private void buscarMarca() {
         String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS);
         System.out.println("Buscando "+tipoVeiculo+" da marca : "+marcaVeiculo);
-        System.out.println(retorno);
+        System.out.println("Retorno em JSON");
+        System.out.println(retorno+"\n");
+        System.out.println("Conversão para objeto");
+        modelos = conversor.obterDados(retorno, DadosModelo.class);
+        System.out.println(modelos.modelos());
         promptModelo();
     }
 
     private void buscarModelo() {
-        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
+        //String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
         System.out.println("Buscando "+tipoVeiculo+" da marca : "+marcaVeiculo+"; modelo: "+modeloVeiculo);
-        System.out.println(retorno);
+        System.out.println("Stream modelo");
+        List<String> valores = modelos.modelos().stream()
+            .filter(n -> n.nome().toUpperCase().contains(modeloVeiculo.toUpperCase()))
+            .map(n -> n.codigo())
+            .collect(Collectors.toList());
+            //.forEach(System.out::println);
+        /* modelos.anos().stream()
+            .forEach(System.out::println); */ 
+        valores.forEach(System.out::println);
+        valores.stream()
+            .forEach(v -> {
+                String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+v+API_ANOS);
+                System.out.println("json modelo");
+                System.out.println(retorno);
+                System.out.println("Conversão para objeto");
+                listaDados = conversor.obterListaDados(retorno, Dados.class);
+                System.out.println(listaDados);
+            });
+        //String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
         promptDetalhesModelo();
     }
 
     private void detalharModelo() {
         String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS+codModeloVeiculo);
-        String detalhes = """
+        /* String detalhes = """
                 TipoVeiculo: 1,
                 Valor: R$ 14.000,00,
                 Marca: Fiat,
@@ -123,7 +149,7 @@ public class Principal {
                 MesReferencia: Julho de 2023
                 SiglaCombustivel: G
                 """;
-        System.out.println(detalhes);
+        System.out.println(detalhes); */
         System.out.println(retorno);
         promptModelo();
     }

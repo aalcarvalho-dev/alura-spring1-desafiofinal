@@ -1,21 +1,21 @@
 package com.alura.spring_desafiofinal.model;
 
 public class Veiculo {
-    public String nome;
-    public String ano;
+    public String marca;
+    public String modelo;
     public Double valor;
     public String combustivel;
-    public String getNome() {
-        return nome;
+    public String getMarca() {
+        return marca;
     }
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setMarca(String nome) {
+        this.marca = nome;
     }
-    public String getAno() {
-        return ano;
+    public String getModelo() {
+        return modelo;
     }
-    public void setAno(String ano) {
-        this.ano = ano;
+    public void setModelo(String ano) {
+        this.modelo = ano;
     }
     public Double getValor() {
         return valor;
@@ -31,7 +31,7 @@ public class Veiculo {
     }
     @Override
     public String toString() {
-        return nome + " ano:" + ano + ", valor:" + valor + ", combustivel:" + combustivel;
+        return marca + " modelo:" + modelo + ", valor:" + valor + ", combustivel:" + combustivel;
     }
     
 }
