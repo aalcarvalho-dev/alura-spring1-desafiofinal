@@ -8,6 +8,8 @@ public class SpringDesafioFinalApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringDesafioFinalApplication.class, args);
+		Principal principal = new Principal();
+		principal.inicia();
 	}
 
 }
