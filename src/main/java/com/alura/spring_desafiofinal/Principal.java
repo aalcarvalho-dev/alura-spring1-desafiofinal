@@ -6,8 +6,9 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import com.alura.spring_desafiofinal.model.Dados;
-import com.alura.spring_desafiofinal.model.DadosMarca;
 import com.alura.spring_desafiofinal.model.DadosModelo;
+import com.alura.spring_desafiofinal.model.DadosVeiculo;
+import com.alura.spring_desafiofinal.model.Veiculo;
 import com.alura.spring_desafiofinal.service.ConsumoAPI;
 import com.alura.spring_desafiofinal.service.ConverteDados;
 
@@ -24,7 +25,6 @@ public class Principal {
 
     ConsumoAPI api = new ConsumoAPI();
     ConverteDados conversor = new ConverteDados();
-    List<DadosMarca> listaMarcas = new ArrayList<>();
     List<Dados> listaDados = new ArrayList<>();
     DadosModelo modelos;
     //Dados dados;
@@ -75,20 +75,21 @@ public class Principal {
         if (modeloVeiculo.equalsIgnoreCase("0")) {
             promptMarca();
         }
-        buscarModelo();
+        filtraPorModelo();
+        //buscarModelo();
     }
 
-    private void promptDetalhesModelo() {
+    private void promptCodModelo() {
         Scanner leitura = new Scanner(System.in);
         System.out.print("\nDigite o código do modelo do veículo ou 0 para voltar ao menu anterior: ");
         codModeloVeiculo = leitura.nextLine();
         System.out.println("Você digitou: "+codModeloVeiculo);
         if (codModeloVeiculo.equalsIgnoreCase("0")) {
-            promptModelo();
+            promptMarca();
         }
-        //detalharModelo();
+        buscarModelo();
     }
-    
+
     private void buscarVeiculo() {
         var retorno = api.obterDados(API+tipoVeiculo+API_MARCA);
         listaDados = conversor.obterListaDados(retorno, Dados.class);
@@ -107,33 +108,28 @@ public class Principal {
         promptModelo();
     }
 
+    private void filtraPorModelo() {
+        List<Dados> modelosFiltrados = modelos.modelos().stream()
+                        .filter(m -> m.nome().toUpperCase().contains(modeloVeiculo.toUpperCase()))
+                        .collect(Collectors.toList());
+        System.out.println("Modelos Filtrados");
+        modelosFiltrados.forEach(System.out::println);
+        promptCodModelo();
+    }
+
     private void buscarModelo() {
-        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
+        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+codModeloVeiculo+API_ANOS);
         listaDados = conversor.obterListaDados(retorno, Dados.class);
         listaDados.forEach(d -> {
-            //System.out.println("COD: "+d.codigo()+"   DESCRIÇÃO: "+d.nome());
             detalharModelo(d.codigo());
         });
-        //promptDetalhesModelo();
     }
 
     private void detalharModelo(String codigo) {
-        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS+codigo);
-        /* String detalhes = """
-                TipoVeiculo: 1,
-                Valor: R$ 14.000,00,
-                Marca: Fiat,
-                Modelo: Palio Weekend Stile 1.6,
-                AnoModelo: 2003
-                Combustível: Gasolina,
-                CodigoFipe: 001912-9
-                MesReferencia: Julho de 2023
-                SiglaCombustivel: G
-                """;
-        System.out.println(detalhes); */
-        System.out.println(retorno);
-        //conversor.
-        //promptModelo();
+        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+codModeloVeiculo+API_ANOS+codigo);
+        //System.out.println(retorno);
+        DadosVeiculo dadosVeiculo = conversor.obterDados(retorno, DadosVeiculo.class);
+        System.out.println(dadosVeiculo);
     }
 
     private void sair() {

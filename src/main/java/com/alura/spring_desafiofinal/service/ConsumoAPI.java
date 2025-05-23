@@ -7,10 +7,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ConsumoAPI {
-    public String obterDados(String endereço){
+    public String obterDados(String endereco){
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(endereço))
+                            .uri(URI.create(endereco))
                             .build();
         HttpResponse<String> response = null;
         try {
