@@ -1,4 +1,4 @@
-package com.alura.spring_desafiofinal.interfaces;
+package com.alura.spring_desafiofinal.service;
 
 import java.util.List;
 

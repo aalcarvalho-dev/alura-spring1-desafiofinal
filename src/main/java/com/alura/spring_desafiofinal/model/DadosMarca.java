@@ -1,4 +1,4 @@
-package com.alura.spring_desafiofinal.record;
+package com.alura.spring_desafiofinal.model;
 
 import java.util.List;
 
