@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import com.alura.spring_desafiofinal.record.Dados;
-import com.alura.spring_desafiofinal.record.DadosMarca;
-import com.alura.spring_desafiofinal.record.DadosModelo;
+import com.alura.spring_desafiofinal.model.Dados;
+import com.alura.spring_desafiofinal.model.DadosMarca;
+import com.alura.spring_desafiofinal.model.DadosModelo;
 import com.alura.spring_desafiofinal.service.ConsumoAPI;
 import com.alura.spring_desafiofinal.service.ConverteDados;
 
@@ -58,7 +58,7 @@ public class Principal {
     
     private void promptMarca() {
         Scanner leitura = new Scanner(System.in);
-        System.out.print("\nDigite a marca do veículo ("+ tipoVeiculo +") pelo seu código ou 0 para voltar ao menu anterior: ");
+        System.out.print("\nInforme o código da marca de ("+ tipoVeiculo +") para consulta ou 0 para voltar ao menu anterior: ");
         marcaVeiculo = leitura.nextLine();
         System.out.println("Você digitou: "+marcaVeiculo);
         if (marcaVeiculo.equalsIgnoreCase("0")) {
@@ -86,58 +86,39 @@ public class Principal {
         if (codModeloVeiculo.equalsIgnoreCase("0")) {
             promptModelo();
         }
-        detalharModelo();
+        //detalharModelo();
     }
     
     private void buscarVeiculo() {
         var retorno = api.obterDados(API+tipoVeiculo+API_MARCA);
-        System.out.println("Buscando marcas de: "+tipoVeiculo);
-        System.out.println("Retorno em JSON");
-        System.out.println(retorno+"\n");
-        System.out.println("Conversão para objeto");
         listaDados = conversor.obterListaDados(retorno, Dados.class);
-        System.out.println(listaDados);
+        listaDados.forEach(d -> {
+            System.out.println("COD: "+d.codigo()+"   DESCRIÇÃO: "+d.nome());
+        });
 
     }
     
     private void buscarMarca() {
         String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS);
-        System.out.println("Buscando "+tipoVeiculo+" da marca : "+marcaVeiculo);
-        System.out.println("Retorno em JSON");
-        System.out.println(retorno+"\n");
-        System.out.println("Conversão para objeto");
         modelos = conversor.obterDados(retorno, DadosModelo.class);
-        System.out.println(modelos.modelos());
+        modelos.modelos().forEach(d -> {
+            System.out.println("COD: "+d.codigo()+"   DESCRIÇÃO: "+d.nome());
+        });
         promptModelo();
     }
 
     private void buscarModelo() {
-        //String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
-        System.out.println("Buscando "+tipoVeiculo+" da marca : "+marcaVeiculo+"; modelo: "+modeloVeiculo);
-        System.out.println("Stream modelo");
-        List<String> valores = modelos.modelos().stream()
-            .filter(n -> n.nome().toUpperCase().contains(modeloVeiculo.toUpperCase()))
-            .map(n -> n.codigo())
-            .collect(Collectors.toList());
-            //.forEach(System.out::println);
-        /* modelos.anos().stream()
-            .forEach(System.out::println); */ 
-        valores.forEach(System.out::println);
-        valores.stream()
-            .forEach(v -> {
-                String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+v+API_ANOS);
-                System.out.println("json modelo");
-                System.out.println(retorno);
-                System.out.println("Conversão para objeto");
-                listaDados = conversor.obterListaDados(retorno, Dados.class);
-                System.out.println(listaDados);
-            });
-        //String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
-        promptDetalhesModelo();
+        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS);
+        listaDados = conversor.obterListaDados(retorno, Dados.class);
+        listaDados.forEach(d -> {
+            //System.out.println("COD: "+d.codigo()+"   DESCRIÇÃO: "+d.nome());
+            detalharModelo(d.codigo());
+        });
+        //promptDetalhesModelo();
     }
 
-    private void detalharModelo() {
-        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS+codModeloVeiculo);
+    private void detalharModelo(String codigo) {
+        String retorno = api.obterDados(API+tipoVeiculo+API_MARCA+marcaVeiculo+API_MODELOS+modeloVeiculo+API_ANOS+codigo);
         /* String detalhes = """
                 TipoVeiculo: 1,
                 Valor: R$ 14.000,00,
@@ -151,7 +132,8 @@ public class Principal {
                 """;
         System.out.println(detalhes); */
         System.out.println(retorno);
-        promptModelo();
+        //conversor.
+        //promptModelo();
     }
 
     private void sair() {
